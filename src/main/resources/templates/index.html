@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Polling App</title>
+</head>
+<body>
+
+    <!-- Your HTML form for creating polls goes here -->
+    <form action="/api/polls" method="post" id="createPollForm">
+        <!-- Form fields for creating polls -->
+        <label for="question">Question:</label>
+        <input type="text" id="question" name="question" required>
+        <label for="options">Options (comma-separated):</label>
+        <input type="text" id="options" name="options" required>
+        <button type="submit">Create Poll</button>
+    </form>
+
+    <!-- You can keep the other forms for voting and viewing results as they are -->
+
+    <!-- Optional: Add JavaScript to handle form submission asynchronously -->
+    <script>
+        document.getElementById("createPollForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            createPoll(); // Call a function to handle the form submission asynchronously
+        });
+
+        function createPoll() {
+            // Implement the logic to handle the asynchronous form submission, e.g., using AJAX
+            // You can use JavaScript frameworks like Axios or fetch API for this purpose
+            // Example using fetch API:
+            fetch('/api/polls', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    question: document.getElementById('question').value,
+                    options: document.getElementById('options').value.split(',').map(option => option.trim()),
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // You can update the UI or perform any other actions here
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                // Handle errors or display error messages
+            });
+        }
+    </script>
+    <hr>
+
+    <h2>Available Polls</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Sl. No</th>
+                <th>Poll Description</th>
+                <th>Options</th>
+                <th>Vote</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Iterate over the available polls -->
+            <tr th:each="poll, stat : ${polls}">
+                <td th:text="${stat.index + 1}"></td>
+                <td th:text="${poll.question}"></td>
+                <td>
+                    <!-- Iterate over the options and create radio buttons -->
+                    <span th:each="option : ${poll.options}">
+                        <input type="radio" th:id="${'option_' + poll.id + '_' + option}" th:name="${'poll_' + poll.id}" th:value="${option}">
+                        <label th:for="${'option_' + poll.id + '_' + option}" th:text="${option}"></label>
+                    </span>
+                </td>
+                <td>
+                    <button th:onclick="'vote(' + ${poll.id} + ')'" type="button">Vote</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function vote(pollId) {
+            // Implement the logic to handle the vote button click
+            // You can use JavaScript frameworks like Axios or fetch API for this purpose
+            // Example using fetch API:
+            var selectedOption = document.querySelector('input[name="poll_' + pollId + '"]:checked');
+            if (selectedOption) {
+                fetch('/api/polls/' + pollId + '/vote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'selectedOption=' + encodeURIComponent(selectedOption.value),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Vote successful');
+                        // You can update the UI or perform any other actions here
+                    } else {
+                        console.error('Vote failed');
+                        // Handle errors or display error messages
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    // Handle errors or display error messages
+                });
+            } else {
+                console.error('No option selected');
+                // Handle the case where no option is selected
+            }
+        }
+    </script>
+
+</body>
+</html>

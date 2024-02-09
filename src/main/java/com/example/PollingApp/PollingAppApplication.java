@@ -12,7 +12,6 @@ public class PollingAppApplication {
  private static final String BASE_URL = "http://localhost:8080/api"; // Replace with your API base URL
 
     public static void main(String[] args) {
-        SpringApplication.run(PollingAppApplication.class, args);
-
+        SpringApplication.run(PollingAppApplication.class, args); 
     }
 }

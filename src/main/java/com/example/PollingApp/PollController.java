@@ -60,6 +60,7 @@ public class PollController {
 
     @GetMapping("/{pollId}/results")
     public List<Result> getResults(@PathVariable Long pollId) {
+    	System.out.println("Getting results");
         return pollService.getResults(pollId);
     }
     
